@@ -1,0 +1,34 @@
+name: napcat
+
+services:
+  napcat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NAPCAT_IMAGE: "${NAPCAT_IMAGE:-mlikiowa/napcat-docker:v4.18.19}"
+    image: qq-farm-napcat:latest
+    container_name: qq-farm-napcat
+    hostname: "${NAPCAT_DEVICE_NAME:-QQ-Farm-NapCat}"
+    restart: unless-stopped
+    ulimits:
+      core:
+        soft: 0
+        hard: 0
+    environment:
+      NAPCAT_UID: "${NAPCAT_UID:-1000}"
+      NAPCAT_GID: "${NAPCAT_GID:-1000}"
+      NAPCAT_TOKEN: "${NAPCAT_TOKEN:?Set NAPCAT_TOKEN in .env first}"
+    ports:
+      - "127.0.0.1:6099:6099"
+    tmpfs:
+      - /app/.config/QQ:rw,nosuid,nodev,size=1g,mode=0700
+      - /app/napcat/config:rw,nosuid,nodev,size=64m,mode=0700
+      - /app/napcat/logs:rw,nosuid,nodev,size=64m,mode=0700
+      - /tmp:rw,nosuid,nodev,size=256m,mode=1777
+    logging:
+      driver: none
+
+networks:
+  default:
+    name: qq-farm-network
